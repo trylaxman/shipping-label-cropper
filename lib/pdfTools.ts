@@ -33,6 +33,7 @@ async function getFlipkartDottedLineRatio(file: File): Promise<number | null> {
     canvas.height = viewport.height;
 
     await page.render({
+      canvas,
       canvasContext: context,
       viewport,
     }).promise;
@@ -251,7 +252,15 @@ export async function cropFlipkartPdf(file: File) {
 }
 
 export function downloadPdf(bytes: Uint8Array, filename: string) {
-  const blob = new Blob([bytes], { type: "application/pdf" });
+  const arrayBuffer = bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength
+  ) as ArrayBuffer;
+
+  const blob = new Blob([arrayBuffer], {
+    type: "application/pdf",
+  });
+
   const url = URL.createObjectURL(blob);
 
   const link = document.createElement("a");
